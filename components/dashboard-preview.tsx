@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   Flame,
   Target,
@@ -8,11 +9,13 @@ import {
   Sparkles,
   TrendingUp,
   ChevronRight,
+  ArrowUpRight,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
 import { SectionHeading } from "@/components/section-heading";
 import { Reveal } from "@/components/reveal";
+import { Button } from "@/components/ui/button";
 
 const WEAK_SUBJECTS = [
   { subject: "Maths — Probabilités", level: 38, accent: "bg-brand-green" },
@@ -47,6 +50,15 @@ export function DashboardPreview() {
           title="Toute votre progression, en un coup d'œil"
           description="Streak de révision, matières fragiles, examens à venir et prédictions de l'IA — réunis dans un espace clair et motivant."
         />
+
+        <Reveal className="mt-8 flex justify-center">
+          <Button asChild size="lg">
+            <Link href="/dashboard">
+              Ouvrir le tableau de bord
+              <ArrowUpRight className="h-5 w-5" />
+            </Link>
+          </Button>
+        </Reveal>
 
         <Reveal className="mt-14">
           <div className="rounded-card border border-border bg-card p-4 shadow-drop-lg sm:p-6">
