@@ -1,0 +1,5 @@
+.env
+projects/
+claude_data/
+caddy_data/
+caddy_config/

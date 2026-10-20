@@ -75,3 +75,9 @@ lib/
 ```
 
 Toutes les données sont fictives (mock) et centralisées dans `lib/data.ts`.
+
+## ArcReel
+
+Le dossier [`arcreel/`](arcreel/) contient la configuration Docker Compose pour
+déployer [ArcReel](https://github.com/ArcReel/ArcReel) (atelier vidéo IA
+auto-hébergé) — voir [`arcreel/README.md`](arcreel/README.md).

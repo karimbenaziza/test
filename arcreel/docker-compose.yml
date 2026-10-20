@@ -1,0 +1,53 @@
+# ArcReel — self-hosted AI video production workspace
+# Upstream: https://github.com/ArcReel/ArcReel (AGPL-3.0)
+#
+#   cp .env.example .env
+#   docker compose up -d                    # local:  http://localhost:1241
+#   docker compose --profile https up -d    # server: https://$DOMAIN (Caddy + Let's Encrypt)
+
+services:
+  arcreel:
+    image: arcreel/arcreel:${ARCREEL_VERSION:-0.33.0}
+    # Loopback by default so ArcReel is never exposed without HTTPS in front.
+    # Set ARCREEL_BIND=0.0.0.0 in .env only behind a VPN or your own proxy.
+    ports:
+      - "${ARCREEL_BIND:-127.0.0.1}:1241:1241"
+    env_file: .env
+    environment:
+      TZ: ${TZ:-UTC}
+    # The agent's Bash sandbox (bubblewrap) needs unprivileged user namespaces
+    # and NET_ADMIN to bring up loopback inside its nested net namespace.
+    security_opt:
+      - seccomp:unconfined
+      - apparmor:unconfined
+    cap_add:
+      - NET_ADMIN
+    volumes:
+      # ArcReel writes the generated AUTH_PASSWORD back into this file on first start.
+      - ./.env:/app/.env
+      - ./projects:/app/projects
+      - ./claude_data:/root/.claude
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1241/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  caddy:
+    image: caddy:2
+    profiles: ["https"]
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      # Must be a real hostname whose DNS points at this server.
+      DOMAIN: ${DOMAIN:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy_data:/data
+      - ./caddy_config:/config
+    depends_on:
+      - arcreel
+    restart: unless-stopped
